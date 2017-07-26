@@ -1,16 +1,32 @@
 import Ember from 'ember';
 
+const { computed, isArray } = Ember;
+
 export default Ember.Component.extend({
   dragCoordinator: Ember.inject.service(),
   tagName: "div",
   overrideClass: 'draggable-object',
-  classNameBindings: [':js-draggableObject','isDraggingObject:is-dragging-object:', 'overrideClass'],
+  classNameBindings: [':js-draggableObject','isDraggingObject:is-dragging-object:', 'overrideClass', 'selected'],
   attributeBindings: ['dragReady:draggable'],
   isDraggable: true,
   dragReady: true,
   isSortable: false,
+  selectable: false,
   sortingScope: 'drag-objects',
   title: Ember.computed.alias('content.title'),
+
+  payload: computed('selectable', 'selected', 'content', 'aggregatedContent.[]', function () {
+    return this.get('selectable') && this.get('selected') ?
+      this.get('aggregatedContent') :
+      this.get('content');
+  }),
+
+  selected: computed('aggregatedContent.[]', 'content', function () {
+    if (isArray(this.get('aggregatedContent'))) {
+      return this.get('aggregatedContent').includes(this.get('content'));
+    }
+    return false;
+  }),
 
   draggable: Ember.computed('isDraggable', function() {
     var isDraggable = this.get('isDraggable');
@@ -62,7 +78,7 @@ export default Ember.Component.extend({
 
     var dataTransfer = event.dataTransfer;
 
-    var obj = this.get('content');
+    var obj = this.get('payload');
     var id = null;
     if (this.get('coordinator')) {
        id = this.get('coordinator').setObject(obj, { source: this });
@@ -96,7 +112,7 @@ export default Ember.Component.extend({
       return;
     }
 
-    var obj = this.get('content');
+    var obj = this.get('payload');
 
     if (obj && typeof obj === 'object') {
       Ember.set(obj, 'isDraggingObject', false);
@@ -134,9 +150,17 @@ export default Ember.Component.extend({
     event.preventDefault();
   },
 
+  updateSelection() {},
+
+  click() {
+    if (this.get('selectable')) {
+      this.get('updateSelection')(this);
+    }
+  },
+
   actions: {
     selectForDrag() {
-      var obj = this.get('content');
+      var obj = this.get('payload');
       var hashId = this.get('coordinator').setObject(obj, { source: this });
       this.set('coordinator.clickedId', hashId);
     }

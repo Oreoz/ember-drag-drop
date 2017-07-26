@@ -122,3 +122,11 @@ html, body {
   border: 1px solid #333;
   cursor: move;
 }
+
+.dragObject.u-pullLeft {
+  margin: 0.5em;
+}
+
+.dragObject.selected {
+  background-color: violet;
+}

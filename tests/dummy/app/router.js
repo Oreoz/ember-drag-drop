@@ -14,6 +14,7 @@ Router.map(function() {
   this.route("handle");
   this.route("horizontal");
   this.route("multiple");
+  this.route('drag-multiple');
 });
 
 export default Router;

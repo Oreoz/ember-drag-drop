@@ -7,8 +7,12 @@ export default Ember.Component.extend(Droppable, {
   isOver: false,
 
   handlePayload: function(payload, event) {
-    var obj = this.get('coordinator').getObject(payload,{target: this});
-    this.sendAction('action',obj,{target: this, event: event});
+    var obj = this.get('coordinator').getObject(payload, { target: this });
+    this.sendAction('action', obj, { target: this, event: event });
+
+    if (Ember.isArray(obj)) {
+      obj.clear();
+    }
   },
 
   handleDrop: function(event) {
