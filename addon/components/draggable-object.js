@@ -12,6 +12,9 @@ export default Ember.Component.extend({
   dragReady: true,
   isSortable: false,
   selectable: false,
+  dragImageSelector: null,
+  dragImageXOffset: 0,
+  dragImageYOffset: 0,
   sortingScope: 'drag-objects',
   title: Ember.computed.alias('content.title'),
 
@@ -64,13 +67,15 @@ export default Ember.Component.extend({
     });
   },
 
-  willDestroyElement(){
+  willDestroyElement() {
     if (this.$(this.get('dragHandle'))) {
       this.$(this.get('dragHandle')).off();
     }
   },
 
   dragStart(event) {
+    this._setDragImage();
+
     if (!this.get('isDraggable') || !this.get('dragReady')) {
       event.preventDefault();
       return;
@@ -155,6 +160,24 @@ export default Ember.Component.extend({
   click() {
     if (this.get('selectable')) {
       this.get('updateSelection')(this);
+    }
+  },
+
+  _setDragImage() {
+    if (this.get('dragImageSelector')) {
+      let xOffset = this.get('dragImageXOffset');
+      let yOffset = this.get('dragImageYOffset');
+      let selector = this.get('dragImageSelector');
+
+      let htmlElement = Ember.$(selector)[0];
+
+      if (!htmlElement) {
+        Ember.Logger.warn(`Draggable Object: The provided \`dragImageSelector\` (${selector}) ` +
+          'did not yield any HTML element, therefore no drag image was set.');
+        return;
+      }
+
+      event.dataTransfer.setDragImage(htmlElement, xOffset, yOffset);
     }
   },
 

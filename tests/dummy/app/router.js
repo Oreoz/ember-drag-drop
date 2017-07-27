@@ -15,6 +15,7 @@ Router.map(function() {
   this.route("horizontal");
   this.route("multiple");
   this.route('drag-multiple');
+  this.route('drag-image');
 });
 
 export default Router;

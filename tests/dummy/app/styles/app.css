@@ -130,3 +130,14 @@ html, body {
 .dragObject.selected {
   background-color: violet;
 }
+
+.drag-image {
+  background-color: red;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  right: -2000px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 90px;
+}
