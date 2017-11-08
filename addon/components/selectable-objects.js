@@ -6,18 +6,47 @@ export default Ember.Component.extend({
 
   aggregatedContent: null,
 
+  onKeyDown(e) {
+    if (e.keyCode === 17) {
+      this.set('enableMultipleSelection', true);
+    }
+  },
+
+  onKeyUp(e) {
+    if (e.keyCode === 17) {
+      this.set('enableMultipleSelection', false);
+    }
+  },
+
   init() {
     this._super(...arguments);
-    this.set('aggregatedContent', new Ember.A());
+    this.set('aggregatedContent', Ember.A());
+
+    this.set('onKeyDown', this.get('onKeyDown').bind(this));
+    this.set('onKeyUp', this.get('onKeyUp').bind(this));
   },
+
+  didReceiveAttrs() {
+    this._super(...arguments);
+
+    window.addEventListener('keydown', this.get('onKeyDown'), false);
+    window.addEventListener('keyup', this.get('onKeyUp'), false);
+  },
+
 
   actions: {
     updateSelection(draggableObject) {
       let selected = draggableObject.get('selected');
+      let enableMultipleSelection = this.get('enableMultipleSelection');
 
-      if (selected) {
-        this.get('aggregatedContent').removeObject(draggableObject.get('content'));
+      if (enableMultipleSelection) {
+        if (selected) {
+          this.get('aggregatedContent').removeObject(draggableObject.get('content'));
+        } else {
+          this.get('aggregatedContent').pushObject(draggableObject.get('content'));
+        }
       } else {
+        this.set('aggregatedContent', Ember.A());
         this.get('aggregatedContent').pushObject(draggableObject.get('content'));
       }
     }
